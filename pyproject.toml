@@ -5,7 +5,10 @@ description = ""
 authors = ["michaelcordero <michaelpetercordero@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9,<3.12"
+numpy = "^1.23.2"
+sympy = "^1.11.1"
+scipy = "^1.9.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
