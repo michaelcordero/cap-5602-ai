@@ -16,8 +16,7 @@ def vec_to_prob(r: np.array) -> np.array:
     summation = 0
     for i in r:
         summation += e ** i
-    results = [e ** i / summation for i in r]
-    p = np.array(results)
+    p = np.apply_along_axis(lambda j: e**j / summation, 0, r)
     return p
 
 
@@ -34,11 +33,8 @@ np.array([[4, 6], [3.5, 9.1]]) Output: [[0.11920292, 0.88079708], [0.00368424, 0
 5], [10, 3.7, 12], [4, 5.5, 0]])) Output: [[4.15115123e-02, 1.24707475e-01, 8.33781013e-01], [1.19176835e-01,
 2.18844992e-04, 8.80604320e-01], [1.81818026e-01, 8.14851861e-01, 3.33011331e-03]] :param R: :return: q
     """
-    p = np.array([])
-    for i in R:
-        p = np.append(p, vec_to_prob(i))
-    q = np.asmatrix(p)
-    return q
+    p: np.array = np.apply_along_axis(vec_to_prob, 1, R)
+    return p
 
 
 def scipy_mat_to_prob(R: np.array) -> np.array:
@@ -48,11 +44,8 @@ def scipy_mat_to_prob(R: np.array) -> np.array:
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.softmax.html. Then write code to apply this
     version of the softmax function on the sample matrices above and print out the results. :param R: :return: q
     """
-    p = np.array([])
-    for i in R:
-        p = np.append(p, softmax(i))
-    q = np.asmatrix(p)
-    return q
+    p: np.array = np.apply_over_axes(softmax, R, 1)
+    return p
 
 
 def scale_vec(r: np.array) -> np.array:
@@ -63,21 +56,30 @@ def scale_vec(r: np.array) -> np.array:
     Python function scale_vec(r) that takes the vector  𝑟  as input and returns the scaled vector  𝑣 . Sample
     inputs and outputs: Input: np.array([1, 3, 5]), output: [-1.22474487, 0., 1.22474487] Input: np.array([3.3, 1.2,
     -2.7, -0.6]), output: [1.35457092, 0.40637128, -1.35457092, -0.40637128] :param r: :return: q
+
+    Note on broadcasting: see: https://numpy.org/doc/stable/user/basics.broadcasting.html
+    Basically, in order to carry out operations to vectors and matrices, numpy will stretch the smaller vector/matrix
+    to match the dimensions of the larger vector/matrix. This is also true for scalars, as is the case with the
+    following code. Each scalar m and s, are automatically applied or "broadcast" to each element in the matrix r.
+    Why bother? Why not use for loop? Because the execution will happen in C, and not Python, leading to performance
+    gains.
     """
-    q = np.array([])
     m = np.mean(r)
     s = np.std(r)
-    for i in r:
-        q = np.append(q, (i - m) / s)
+    q: np.array = (r - m) / s  # broadcasting
     return q
 
 
 if __name__ == '__main__':
-    # t = np.array([4, 6])
-    # u = vec_to_prob(t)
+    r = np.array([4, 6])
+    t = np.array([3.4, 6.2, 7.1, 9.8])
+    u = vec_to_prob(t)
+    print(u)
     # v = np.array([[4, 6], [3.5, 9.1]])
     # w = mat_to_prob(v)
+    # print(w)
     # x = scipy_mat_to_prob(v)
-    y = np.array([3.3, 1.2, -2.7, -0.6])
-    z = scale_vec(y)
-    print(z)
+    # print(x)
+    # y = np.array([3.3, 1.2, -2.7, -0.6])
+    # z = scale_vec(y)
+    # print(z)
