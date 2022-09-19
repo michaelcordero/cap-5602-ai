@@ -1,4 +1,3 @@
-import math
 import numpy as np
 from scipy.special import softmax
 
@@ -12,11 +11,8 @@ def vec_to_prob(r: np.array) -> np.array:
     non-empty. Sample inputs and outputs: Input: np.array([4, 6]), output: [0.11920292, 0.88079708] Input: np.array([
     3.4, 6.2, 7.1, 9.8]), output: [0.00151576, 0.02492606, 0.06130823, 0.91224995]
     """
-    e = math.e
-    summation = 0
-    for i in r:
-        summation += e ** i
-    p = np.apply_along_axis(lambda j: e**j / summation, 0, r)
+    exp = np.exp(r)
+    p = exp / np.sum(exp)
     return p
 
 
